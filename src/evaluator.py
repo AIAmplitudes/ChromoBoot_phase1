@@ -10,7 +10,8 @@ from collections import OrderedDict
 from concurrent.futures import ProcessPoolExecutor
 import os
 import numpy as np
-from rels_utils import *
+from AIAmplitudes_common_public.rels_utils import (check_coeffs_in_rel,check_rel,
+                                                   replace_trivial0_terms,update_rel_instances_in_symb)
 import csv
 import torch
 import numpy as np
