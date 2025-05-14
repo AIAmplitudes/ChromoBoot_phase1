@@ -14,8 +14,8 @@ import numpy as np
 import argparse
 from sympy import factorint
 from rels_utils import output_rel_instances_jsons, generate_trivial0_symb
-from AIAmplitudes_common_public.rels_utils import rels_to_generate, rels_to_generate_compact_default
-from AIAmplitudes_common_public.commonclasses import bool_flag
+from aiamplitudes_common_public.rels_utils import rels_to_generate, rels_to_generate_compact_default
+from aiamplitudes_common_public.commonclasses import bool_flag
 
 triple_list = ['aaa', 'bbb', 'ccc', 'aab', 'bbc', 'cca', 'aac', 'bba', 'ccb', 'aae', 'bbf', 'ccd', 'aaf', 'bbd', 'cce',
                'afa', 'bdb', 'cec', 'aff', 'bdd', 'cee']
@@ -46,11 +46,14 @@ def get_parser():
     parser.add_argument("--orbit", choices=["", "single_quad", "single_triple", "single_quadtrip"], default="")
     parser.add_argument("--generate_relations", type=bool_flag, default=False,
                         help="Generate relations.")
+    parser.add_argument("--return_insts", type=bool_flag, default=False,
+                        help="return all insts as a python object, for debug")
     parser.add_argument("--raw_symbol_json", type=bool_flag, default=False, help="write the nonzero elems of symbol as a json")
 
     return parser
 
 def readESymb(loop, name, quad, ae, aef, octuples=False):
+    print(name)
     assert os.path.isfile(name)
     res = ''
     if octuples:
@@ -463,6 +466,24 @@ def build_zero_file(number, trivial_frac, data, loops, outfile, binary, sign_las
 
     file_handler.close()
 
+def combine_jsons(params, to_gens):
+    python_objects=[]
+    if params.rels_output_path:
+        outpath=params.rels_output_path
+        allrels = [f'{relname}{index}' for relname, rel_info in to_gens.items() for index in range(len(rel_info[0]))]
+        with open(outpath + f'/rel_instances_all_relations.json', 'w') as f2:
+            f2.write('[')
+            for i,relname in enumerate(allrels):
+                with open(outpath + f'/rel_instances_{relname}.json', 'r') as f:
+                    d=json.load(f)
+                    for j,inst in enumerate(d):
+                        if not (i == 0 and j == 0): f2.write(',\n')
+                        json.dump(inst,f2)
+                        if params.return_insts:
+                            python_objects += inst
+            f2.write(']')
+    return python_objects if params.return_insts else None
+
 if __name__ == '__main__':
 
     params = get_parser().parse_args()
@@ -520,6 +541,7 @@ if __name__ == '__main__':
             to_gen = rels_to_generate
 
         print(f"generating relations ...")
+        if not os.path.exists(rels_output_path): os.makedirs(rels_output_path)
         #for now, rels_to_generate is hardcoded, need to see how it varies with loop order
         output_rel_instances_jsons(loops, data, params.rels_output_path+"/", rels_to_generate=to_gen, format=format, seed=0)
         json_files = os.listdir(params.rels_output_path)
@@ -528,13 +550,6 @@ if __name__ == '__main__':
             print("removing old combined file")
         except:
             print("No existing combined file, creating")
-        # Create an empty list to store the Python objects.
-        python_objects = []
-        # Load each JSON file into a Python object.
-        for json_file in json_files:
-            with open(params.rels_output_path+"/"+ json_file, "r") as f:
-                python_objects += json.load(f)
+        combine_jsons(params,to_gen)
 
-        # Dump all the Python objects into a single JSON file.
-        with open(f"{params.rels_output_path}/rel_instances_all_relations.json", "w") as f:
-            json.dump(python_objects, f)
+

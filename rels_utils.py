@@ -11,8 +11,8 @@ import time
 import datetime
 import itertools
 from itertools import permutations
-from AIAmplitudes_common_public import alphabet, quad_prefix
-from AIAmplitudes_common_public.rels_utils import (first_entry_rel_table,double_adjacency_rel_table,
+from aiamplitudes_common_public import alphabet, quad_prefix
+from aiamplitudes_common_public.rels_utils import (first_entry_rel_table,double_adjacency_rel_table,
                                                    triple_adjacency_rel_table,integral_rel_table,get_rel_table_dihedral,
                                                    final_entries_rel_table,initial_entries_rel_table,
                                                    check_rel,check_coeffs_in_rel,get_dihedral_terms_in_symb,get_rel_terms_in_symb,
