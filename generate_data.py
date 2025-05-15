@@ -541,7 +541,7 @@ if __name__ == '__main__':
             to_gen = rels_to_generate
 
         print(f"generating relations ...")
-        if not os.path.exists(rels_output_path): os.makedirs(rels_output_path)
+        if not os.path.exists(params.rels_output_path): os.makedirs(params.rels_output_path)
         #for now, rels_to_generate is hardcoded, need to see how it varies with loop order
         output_rel_instances_jsons(loops, data, params.rels_output_path+"/", rels_to_generate=to_gen, format=format, seed=0)
         json_files = os.listdir(params.rels_output_path)
