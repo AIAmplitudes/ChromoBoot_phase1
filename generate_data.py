@@ -489,8 +489,6 @@ if __name__ == '__main__':
     params = get_parser().parse_args()
     input_file = params.input_file
     output_file = params.output_file
-    print('tag')
-    print(params.rels_output_path)
     loops = params.loops
     base = params.base  # zero for raw export, else 1000
     case = params.case

@@ -72,10 +72,7 @@ def build_modules(env, params):
             f"Number of parameters ({k}): {sum([p.numel() for p in v.parameters() if p.requires_grad])}"
         )
 
-    # cuda
-    #if not params.cpu:
-    #    for v in modules.values():
-    #        v.cuda()
+    # gpu
     if not params.cpu:
         if torch.cuda.is_available():  
             for v in modules.values():

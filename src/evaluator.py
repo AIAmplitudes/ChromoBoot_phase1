@@ -207,12 +207,6 @@ class Evaluator(object):
                 n_eval_metrics[metric]=0
 
             # initialize metric
-            #if params.cpu==False:
-            #    tokenwise_acc_macro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words),average="macro").cuda()
-            #    tokenwise_acc_micro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words)).cuda()
-            #else:
-            #    tokenwise_acc_macro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words),average="macro")
-            #    tokenwise_acc_micro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words))
             device = "cpu"
             if params.cpu == False:
                 if torch.backends.mps.is_available():

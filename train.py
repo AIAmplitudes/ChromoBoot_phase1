@@ -280,12 +280,7 @@ def main(params):
     if params.is_slurm_job:
         init_signal_handler()
 
-    # CPU / CUDA
-    #if params.cpu:
-    #    assert not params.multi_gpu
-    #else:
-    #    assert torch.cuda.is_available()
-    #src.utils.CUDA = not params.cpu
+    # CPU / GPU
     if params.cpu:
         assert not params.multi_gpu
         src.utils.CUDA = False

@@ -163,12 +163,9 @@ def init_distributed_mode(params):
         elif torch.backends.mps.is_available():
             device = torch.device("mps")
             print("Running on Apple M4 Pro GPU with MPS backend.")
-            # Move model and data to the correct device
-            #model.to(device)
-            #input_tensor = input_tensor.to(device)
         # If neither CUDA nor MPS is available, use CPU
         else:
-            #device = torch.device("cpu")
+            device = torch.device("cpu")
             print("Running on CPU.")
             
             

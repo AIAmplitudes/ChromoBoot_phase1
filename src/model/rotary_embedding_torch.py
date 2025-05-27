@@ -34,7 +34,7 @@ elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
 else:
     device_type = 'cpu'
 
-@autocast(device_type, enabled = True)
+@autocast(device_type, enabled = False)
 def apply_rotary_emb(freqs, t, start_index = 0, scale = 1., seq_dim = -2):
     if t.ndim == 3:
         seq_len = t.shape[seq_dim]
@@ -241,7 +241,7 @@ class RotaryEmbedding(Module):
         freqs = broadcat(all_freqs, dim = -1)
         return freqs
 
-    @autocast(device_type, enabled = True)
+    @autocast(device_type, enabled = False)
     def forward(
         self,
         t: Tensor,
