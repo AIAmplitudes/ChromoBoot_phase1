@@ -34,13 +34,6 @@ with zeroes
       22416 loop4.prefix
      527760 loop5.prefix
     9832932 loop6.prefix
-    
-Obtained:
-        24 Output/loop2.prefix
-     1272 Output/loop3.prefix
-    22399 Output/loop4.prefix
-   527391 Output/loop5.prefix
-  9825359 Output/loop6.prefix
 
 without zeroes
          12 loop2.prefix
