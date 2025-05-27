@@ -73,8 +73,18 @@ def build_modules(env, params):
         )
 
     # cuda
+    #if not params.cpu:
+    #    for v in modules.values():
+    #        v.cuda()
     if not params.cpu:
-        for v in modules.values():
-            v.cuda()
+        if torch.cuda.is_available():  
+            for v in modules.values():
+                v.cuda()  
+        elif torch.backends.mps.is_available(): 
+            for v in modules.values():
+                v.to('mps')        
+        else:  
+            for v in modules.values():
+                v.cpu() 
 
     return modules

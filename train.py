@@ -281,11 +281,24 @@ def main(params):
         init_signal_handler()
 
     # CPU / CUDA
+    #if params.cpu:
+    #    assert not params.multi_gpu
+    #else:
+    #    assert torch.cuda.is_available()
+    #src.utils.CUDA = not params.cpu
     if params.cpu:
         assert not params.multi_gpu
+        src.utils.CUDA = False
+        src.utils.MPS = False 
+    elif torch.cuda.is_available():
+        src.utils.CUDA = True
+        src.utils.MPS = False 
     else:
-        assert torch.cuda.is_available()
-    src.utils.CUDA = not params.cpu
+        assert torch.backends.mps.is_available()
+        src.utils.CUDA = False 
+        src.utils.MPS = True 
+        print("Using MPS for GPU acceleration")
+        
 
     # build environment / modules / trainer / evaluator
     print(params.signs_mask_prob_train)

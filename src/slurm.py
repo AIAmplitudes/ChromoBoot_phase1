@@ -150,9 +150,28 @@ def init_distributed_mode(params):
     print(PREFIX + "Multi-GPU      : %s" % str(params.multi_gpu))
     print(PREFIX + "Hostname       : %s" % socket.gethostname())
 
-    # set GPU device
+
+
+
+    # set GPU device  
     if not params.cpu:
-        torch.cuda.set_device(params.local_rank)
+        # Check if CUDA (NVIDIA GPU) is available first
+        if torch.cuda.is_available():
+            torch.cuda.set_device(params.local_rank)
+            print("Running on CUDA (NVIDIA GPU).")
+        # If CUDA is not available, check if MPS is available
+        elif torch.backends.mps.is_available():
+            device = torch.device("mps")
+            print("Running on Apple M4 Pro GPU with MPS backend.")
+            # Move model and data to the correct device
+            #model.to(device)
+            #input_tensor = input_tensor.to(device)
+        # If neither CUDA nor MPS is available, use CPU
+        else:
+            #device = torch.device("cpu")
+            print("Running on CPU.")
+            
+            
 
     # initialize multi-GPU
     if params.multi_gpu:

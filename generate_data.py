@@ -14,8 +14,8 @@ import numpy as np
 import argparse
 from sympy import factorint
 from rels_utils import output_rel_instances_jsons, generate_trivial0_symb
-from AIAmplitudes_common_public.rels_utils import rels_to_generate, rels_to_generate_compact_default
-from AIAmplitudes_common_public.commonclasses import bool_flag
+from aiamplitudes_common_public.rels_utils import rels_to_generate, rels_to_generate_compact_default
+from aiamplitudes_common_public.commonclasses import bool_flag
 
 triple_list = ['aaa', 'bbb', 'ccc', 'aab', 'bbc', 'cca', 'aac', 'bba', 'ccb', 'aae', 'bbf', 'ccd', 'aaf', 'bbd', 'cce',
                'afa', 'bdb', 'cec', 'aff', 'bdd', 'cee']
@@ -468,6 +468,8 @@ if __name__ == '__main__':
     params = get_parser().parse_args()
     input_file = params.input_file
     output_file = params.output_file
+    print('tag')
+    print(params.rels_output_path)
     loops = params.loops
     base = params.base  # zero for raw export, else 1000
     case = params.case

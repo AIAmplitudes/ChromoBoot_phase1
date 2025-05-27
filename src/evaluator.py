@@ -10,13 +10,13 @@ from collections import OrderedDict
 from concurrent.futures import ProcessPoolExecutor
 import os
 import numpy as np
-from AIAmplitudes_common_public.rels_utils import (check_coeffs_in_rel,check_rel,
+from aiamplitudes_common_public.rels_utils import (check_coeffs_in_rel,check_rel,
                                                    replace_trivial0_terms,update_rel_instances_in_symb)
 import csv
 import torch
 import numpy as np
 import torchmetrics
-from .utils import to_cuda,get_y_and_mask,inputs_embs_outputs_to_tsv,tokens_embs_to_tsv,plot_attn_maps
+from .utils import to_gpu,get_y_and_mask,inputs_embs_outputs_to_tsv,tokens_embs_to_tsv,plot_attn_maps
 TOLERANCE_THRESHOLD = 1e-1
 logger = getLogger()
 from torch.nn.utils.rnn import pad_sequence
@@ -207,17 +207,25 @@ class Evaluator(object):
                 n_eval_metrics[metric]=0
 
             # initialize metric
-            if params.cpu==False:
-                tokenwise_acc_macro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words),average="macro").cuda()
-                tokenwise_acc_micro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words)).cuda()
-            else:
-                tokenwise_acc_macro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words),average="macro")
-                tokenwise_acc_micro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words))
-
+            #if params.cpu==False:
+            #    tokenwise_acc_macro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words),average="macro").cuda()
+            #    tokenwise_acc_micro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words)).cuda()
+            #else:
+            #    tokenwise_acc_macro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words),average="macro")
+            #    tokenwise_acc_micro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words))
+            device = "cpu"
+            if params.cpu == False:
+                if torch.backends.mps.is_available():
+                    device = "mps"
+                elif torch.cuda.is_available():
+                    device = "cuda"
+            tokenwise_acc_macro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words), average="macro").to(device)
+            tokenwise_acc_micro = torchmetrics.classification.Accuracy(task="multiclass", num_classes=len(env.words)).to(device)
+            
             for (x1, len1), (x2, len2), nb_ops in iterator:
                 #y, pred_mask = get_y_and_mask(x2, len2)
-                # cuda
-                x1_, len1_, x2, len2 = to_cuda(x1, len1, x2, len2)
+                # gpu
+                x1_, len1_, x2, len2 = to_gpu(x1, len1, x2, len2)
                 # target words to predict
                 if params.architecture == "encoder_decoder":
                     alen = torch.arange(len2.max(), dtype=torch.long, device=len2.device)

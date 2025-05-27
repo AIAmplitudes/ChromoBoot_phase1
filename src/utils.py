@@ -41,7 +41,7 @@ try:
 except:
     DUMP_PATH = './checkpoint/htcondor/dumped'
 
-CUDA = True
+GPU = True
 
 
 def is_power_of_p(n,p):
@@ -238,13 +238,24 @@ def get_dump_path(params):
         subprocess.Popen("mkdir -p %s" % params.dump_path, shell=True).wait()
 
 
-def to_cuda(*args):
+def to_gpu(*args):
     """
-    Move tensors to CUDA.
+    Move tensors to GPU.
     """
-    if not CUDA:
+    if not GPU:
         return args
-    return [None if x is None else x.cuda() for x in args]
+    result = []
+    for x in args:
+        if x is None:
+            result.append(None)
+        else:
+            if torch.cuda.is_available():
+                result.append(x.cuda())
+            elif torch.backends.mps.is_available():
+                result.append(x.to('mps'))
+            else:
+                result.append(x)
+    return result
 
 
 class TimeoutError(BaseException):

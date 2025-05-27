@@ -19,7 +19,14 @@ from torch.utils.tensorboard import SummaryWriter
 import wandb
 
 from .optim import get_optimizer
-from .utils import to_cuda
+from .utils import to_gpu
+
+if torch.cuda.is_available():
+    device_type = "cuda"
+elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+    device_type = "mps"
+else:
+    device_type = "cpu"
 
 logger = getLogger()
 
@@ -223,7 +230,11 @@ class Trainer(object):
             and params.fp16 is True
         )
         mod_names = sorted(self.modules.keys())
-        self.scaler = torch.cuda.amp.GradScaler()
+        if device_type == "cuda":
+            self.scaler = torch.cuda.amp.GradScaler()
+        else:
+            # AMP GradScaler is not supported on MPS or CPU as of PyTorch 2.x
+            self.scaler = None
 
     def optimize(self, loss):
         """
@@ -510,13 +521,13 @@ class Trainer(object):
         if params.architecture == "decoder_only":
             # batch
             (x2, len2), _ = self.get_batch(task)
-            # cuda
-            x2, len2 = to_cuda(x2, len2)
+            # gpu
+            x2, len2 = to_gpu(x2, len2)
         else:
             # batch
             (x1, len1), (x2, len2), _ = self.get_batch(task)
-            # cuda
-            x1, len1, x2, len2 = to_cuda(x1, len1, x2, len2)
+            # gpu
+            x1, len1, x2, len2 = to_gpu(x1, len1, x2, len2)
 
         # target words to predict
         if params.architecture != "encoder_only":
@@ -559,7 +570,7 @@ class Trainer(object):
                     "predict", tensor=decoded, pred_mask=pred_mask, y=y, get_scores=False
                 )
             else:
-                with torch.cuda.amp.autocast():
+                with torch.amp.autocast(device_type=device_type):
                     encoded = encoder("fwd", x=x1, lengths=len1, causal=False)
                     decoded = decoder(
                         "fwd",
@@ -583,7 +594,7 @@ class Trainer(object):
                     "predict", tensor=encoded, pred_mask=pred_mask, y=y, get_scores=False
                 )
             else:
-                with torch.cuda.amp.autocast():
+                with torch.amp.autocast(device_type=device_type):
                     encoded = encoder("fwd", x=x1, lengths=len1, causal=False)
                     _, loss = encoder(
                         "predict",
@@ -606,7 +617,7 @@ class Trainer(object):
                     "predict", tensor=decoded, pred_mask=pred_mask, y=y, get_scores=False
                 )
             else:
-                with torch.cuda.amp.autocast():
+                with torch.amp.autocast(device_type=device_type):
                     decoded = decoder(
                         "fwd",
                         x=x2,

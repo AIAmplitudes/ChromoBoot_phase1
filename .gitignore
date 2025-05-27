@@ -1,0 +1,10 @@
+Private/
+**/.DS_Store
+Data/*
+Output/*
+Processed_data/*
+README_perso.md
+Relations/
+checkpoint/
+**/__pycache__/
+wandb/*
