@@ -2,10 +2,17 @@
 data/
 wandb/
 checkpoint/
+Output/
+Processed_data/
+README_perso.md
+Relations/
+**/.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
 
 # C extensions
 *.so
